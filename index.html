@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#f5f4eb">
+  <title>Птичья Дубна — атлас наблюдений</title>
+  <meta name="description" content="Наблюдения птиц Дубны и окрестностей: карта, виды, сезоны и фотографии из iNaturalist за 2020–2025 годы.">
+  <link rel="icon" href="assets/other-bird-placeholder.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="vendor/leaflet.css">
+  <link rel="stylesheet" href="vendor/MarkerCluster.css">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="vendor/leaflet.js"></script>
+  <script defer src="vendor/leaflet.markercluster.js"></script>
+  <script defer src="logic.js"></script>
+  <script defer src="media.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <h1 class="sr-only">Птичья Дубна — атлас наблюдений</h1>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Птичья Дубна — главная">
+      <span><strong>Птичья Дубна</strong><small>Природный атлас · 2020–2025</small></span>
+    </a>
+    <button id="about-open" class="button subtle">О данных</button>
+  </header>
+  <main class="workspace">
+    <aside class="sidebar" id="sidebar" aria-label="Фильтры и список птиц" data-open="false">
+      <div class="sidebar-toolbar"><button class="icon-button mobile-only" id="sidebar-close" aria-label="Закрыть фильтры">×</button></div>
+      <div class="filters">
+        <label for="species-search">Поиск по названию</label>
+        <div class="search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="species-search" placeholder="Например, дятел или синица" autocomplete="off"></div>
+        <span id="species-label" class="filter-label">Виды птиц</span>
+        <div class="species-picker" id="species-picker">
+          <button type="button" id="species-select" class="species-select" aria-labelledby="species-label species-selection-text" aria-expanded="false" aria-controls="species-options-panel"><span id="species-selection-text">Все виды</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button>
+          <div id="species-options-panel" class="species-options-panel" role="group" aria-labelledby="species-label" hidden>
+            <div class="picker-toolbar"><span>Можно выбрать несколько</span><button type="button" id="species-all" class="text-button">Все виды</button></div>
+            <input type="search" id="species-options-search" placeholder="Найти вид в списке" aria-label="Найти вид в списке" autocomplete="off">
+            <div id="species-options" class="species-options"></div>
+            <p id="species-options-empty" class="picker-empty" hidden>Такого вида в списке нет.</p>
+            <button type="button" id="species-done" class="button picker-done">Готово</button>
+          </div>
+        </div>
+        <div class="filter-row"><div><label for="season-select">Сезон</label><select id="season-select"><option value="all">Все сезоны</option><option>Весна</option><option>Лето</option><option>Осень</option><option>Зима</option></select></div><button id="filters-reset" class="text-button">Сбросить</button></div>
+      </div>
+      <div class="results-summary" aria-live="polite"><span>Найдено <b id="filtered-count">…</b></span><span><b id="filtered-species">…</b> <span id="species-word">видов</span></span></div>
+      <div id="cell-selection" class="cell-selection" hidden><div><span class="eyebrow">Выбранная клетка · 1 км</span><strong id="cell-name"></strong><span id="cell-count"></span></div><button id="cell-clear" class="icon-button" aria-label="Снять выбор клетки">×</button></div>
+      <div class="tabs" role="tablist" aria-label="Результаты"><button id="species-tab" class="active" role="tab" aria-selected="true">Виды</button><button id="observations-tab" role="tab" aria-selected="false">Наблюдения</button></div>
+      <div id="results" class="results" aria-label="Список результатов"></div>
+    </aside>
+    <section class="map-shell" aria-label="Карта наблюдений птиц">
+      <div id="map" role="application" aria-label="Интерактивная карта Дубны и окрестностей"></div>
+      <button id="sidebar-toggle" class="button map-filter-button mobile-only" aria-expanded="false" aria-controls="sidebar">Виды и фильтры</button>
+      <div class="map-caption"><strong>Дубна и окрестности</strong><span>3 км от границы города</span></div>
+      <div class="map-legend" id="map-legend">
+        <div class="legend-tools"><label class="grid-toggle"><input type="checkbox" id="grid-toggle" checked><span>Сетка 1 × 1 км</span></label><button type="button" id="markers-toggle" class="marker-toggle" aria-pressed="false" aria-label="Скрыть значки птиц" title="Скрыть значки птиц"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="M3 3 21 21"/></svg><span>Значки</span></button></div>
+        <div class="legend-scale" aria-label="Число наблюдений в клетке"><span style="--swatch:#e6efd3">1–5</span><span style="--swatch:#bfd5a4">6–15</span><span style="--swatch:#8bb980">16–30</span><span style="--swatch:#519368">31–60</span><span style="--swatch:#236b49">61+</span></div>
+        <span class="legend-description">Наблюдений в клетке</span>
+      </div>
+      <div id="map-status" class="map-status" role="status">Загружаем атлас…</div>
+    </section>
+  </main>
+  <dialog id="observation-dialog" class="observation-dialog" aria-labelledby="observation-title">
+    <button id="observation-close" class="icon-button dialog-close" aria-label="Закрыть карточку птицы">×</button>
+    <div class="observation-card">
+      <div class="photo-column"><div class="photo-frame"><img id="observation-photo" alt="" hidden><div id="photo-loading" class="photo-loading" role="status" aria-live="polite" hidden><span class="loading-spinner" aria-hidden="true"></span><strong>Загружаем фотографию…</strong><span>Снимок из этого наблюдения iNaturalist</span></div><div id="photo-fallback" class="photo-fallback" hidden><img id="fallback-icon" src="assets/other-bird-placeholder.svg" alt=""><strong id="photo-fallback-title">Фотографии нет</strong><span id="photo-fallback-text"></span><button type="button" id="photo-retry" class="button" hidden>Повторить загрузку</button></div></div><p id="photo-credit" class="photo-credit"></p><section id="observation-audio" class="observation-audio" aria-label="Аудиозаписи наблюдения" hidden></section></div>
+      <div class="observation-details"><p class="eyebrow">Наблюдение птицы</p><h2 id="observation-title"></h2><p id="scientific-name" class="scientific-name"></p><p id="observation-date" class="date-line"></p><dl id="observation-facts"></dl><a id="observation-source" class="button primary" target="_blank" rel="noopener noreferrer">Открыть в iNaturalist</a><p id="observation-license" class="license-note"></p></div>
+    </div>
+  </dialog>
+  <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title"><button id="about-close" class="icon-button dialog-close" aria-label="Закрыть сведения">×</button><p class="eyebrow">Об атласе</p><h2 id="about-title">Птицы, которых заметили</h2><p>Карта объединяет <strong>626 наблюдений 108 видов</strong> за 2020–2025 годы в Дубне и в пределах 3 км от её границы.</p><p>Источник — <a href="https://www.inaturalist.org" target="_blank" rel="noopener noreferrer">iNaturalist</a>. В выборку вошли наблюдения Research Grade с открытыми координатами и указанной погрешностью до 250 м. Ещё 109 менее точных записей сохранены в проекте QGIS отдельно.</p><p>Цвет сетки показывает количество зарегистрированных наблюдений. Он зависит от активности наблюдателей. Крайние клетки обрезаны по границе территории.</p><h3>Источник и авторство</h3><p>Наблюдения: авторы iNaturalist, лицензии CC0, CC BY, CC BY-NC. Фотографии: индивидуальные лицензии, в том числе некоммерческие. Границы и подложка: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>, ODbL.</p><p>Подготовка данных и пространственный анализ — QGIS. Веб-карта — Leaflet и Leaflet.markercluster. Учебный проект: Куклин Василий, группа 5011.</p><p class="license-note">Снимок данных: 25 ноября 2026 года. Последующие изменения исходных записей могут не отражаться в атласе.</p></dialog>
+</body>
+</html>
