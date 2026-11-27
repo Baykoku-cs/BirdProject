@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Общая заглушка для видов без индивидуальной иконки</title>
+  <path d="M28 108C29 93 34 85 37 74C25 60 27 39 40 27C55 12 81 17 89 36L115 48L91 56C89 70 80 80 69 84C65 94 70 104 78 111Z" fill="#909b93" stroke="#626f64" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M88 37L115 48L90 52Z" fill="#bcc4bb"/>
+  <circle cx="75" cy="38" r="4.2" fill="#fffdf3"/>
+</svg>
