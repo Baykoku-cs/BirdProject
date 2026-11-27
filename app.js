@@ -12,6 +12,7 @@
   const {filterObservations, clusterKind, countCells} = AtlasLogic;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const iconPath = speciesId => data?.species_icons?.[speciesId] || 'assets/other-bird-placeholder.svg';
+  const previewIconPath = speciesId => data?.species_preview_icons?.[speciesId] || iconPath(speciesId);
   const safeUrl = value => { try { const u = new URL(value); return u.protocol === 'https:' ? u.href : ''; } catch { return ''; } };
   const state = {query:'',species:[],season:'all',cell:null,tab:'species',limit:30,markersVisible:true};
   const dateLabel = value => new Intl.DateTimeFormat('ru', {day:'numeric',month:'long',year:'numeric'}).format(new Date(String(value).replaceAll('/','-') + 'T12:00:00'));
@@ -187,7 +188,7 @@
     $('photo-credit').replaceChildren();
     if(url) $('photo-credit').innerHTML=`${escape(o.photo_credit)} · ${licenseLink(o.photo_license)}${safeUrl(o.photo_page)?` · <a href="${safeUrl(o.photo_page)}" target="_blank" rel="noopener noreferrer">Оригинал фото</a>`:''}`;
     else $('photo-credit').textContent=sounds.length?'Аудиозапись относится к этому наблюдению. Иллюстрация выше обозначает вид.':'Иллюстрация обозначает вид, а не конкретное наблюдение.';
-    $('fallback-icon').src=iconPath(o.species_id);
+    $('fallback-icon').src=previewIconPath(o.species_id);
     function loadPhoto() {
       cancelPhoto?.();
       const photo=document.createElement('img'); photo.id='observation-photo'; photo.hidden=true;
@@ -217,7 +218,7 @@
   $('sidebar-toggle').addEventListener('click',()=>setSidebar($('sidebar').dataset.open!=='true'));
   $('sidebar-close').addEventListener('click',()=>setSidebar(false));
   try {
-    const response=await fetch('data/atlas.json'); if(!response.ok)throw new Error('Не удалось прочитать данные'); data=await response.json();
+    const response=await fetch('data/atlas.json?v=webp128-512-20261127'); if(!response.ok)throw new Error('Не удалось прочитать данные'); data=await response.json();
     homeBounds=L.geoJSON(data.scope).getBounds(); map.fitBounds(homeBounds,{padding:[38,38]});
     map.setMaxBounds(homeBounds.pad(1.2));
     L.geoJSON(data.scope,{pane:'scope',interactive:false,style:{color:'#5e7951',weight:1.7,dashArray:'6 5',fill:false,opacity:.85}}).addTo(map);
